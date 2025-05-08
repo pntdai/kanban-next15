@@ -1,7 +1,7 @@
 import { KanbanBoard } from "@/components/kanban/KanbanBoard";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-export default function Home() {
+export default function KanbanPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="border-b px-4 py-3 flex items-center justify-between">
@@ -14,7 +14,7 @@ export default function Home() {
       </main>
 
       <footer className="border-t px-4 py-3 text-center text-sm text-muted-foreground">
-        Kanban Board with Next.js 15, React 19
+        Kanban Board with Next.js 15, React 19, and Shadcn UI
       </footer>
     </div>
   );
