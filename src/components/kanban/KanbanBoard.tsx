@@ -9,14 +9,51 @@ type TTask = {
   description?: string;
   priority: "low" | "medium" | "high";
   status: "todo" | "in-progress" | "done";
+  assignee?: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
 };
 
 interface IKanbanData {
   tasks: TTask[];
+  users: {
+    id: string;
+    name: string;
+    avatar?: string;
+  }[];
 }
 
 // Sample data for demonstration
 const initialData: IKanbanData = {
+  users: [
+    {
+      id: "user-1",
+      name: "Alex Johnson",
+      avatar: "https://ui.shadcn.com/avatars/01.png",
+    },
+    {
+      id: "user-2",
+      name: "Taylor Smith",
+      avatar: "https://ui.shadcn.com/avatars/02.png",
+    },
+    {
+      id: "user-3",
+      name: "Jordan Casey",
+      avatar: "https://ui.shadcn.com/avatars/03.png",
+    },
+    {
+      id: "user-4",
+      name: "Morgan Riley",
+      avatar: "https://ui.shadcn.com/avatars/04.png",
+    },
+    {
+      id: "user-5",
+      name: "Jamie Quinn",
+      avatar: "https://ui.shadcn.com/avatars/05.png",
+    },
+  ],
   tasks: [
     {
       id: "task-1",
@@ -24,6 +61,11 @@ const initialData: IKanbanData = {
       description: "Set up user login and registration",
       priority: "high",
       status: "todo",
+      assignee: {
+        id: "user-1",
+        name: "Alex Johnson",
+        avatar: "https://ui.shadcn.com/avatars/01.png",
+      },
     },
     {
       id: "task-2",
@@ -31,6 +73,11 @@ const initialData: IKanbanData = {
       description: "Create wireframes for the main dashboard",
       priority: "medium",
       status: "todo",
+      assignee: {
+        id: "user-3",
+        name: "Jordan Casey",
+        avatar: "https://ui.shadcn.com/avatars/03.png",
+      },
     },
     {
       id: "task-3",
@@ -38,6 +85,11 @@ const initialData: IKanbanData = {
       description: "Connect to the backend API endpoints",
       priority: "high",
       status: "in-progress",
+      assignee: {
+        id: "user-2",
+        name: "Taylor Smith",
+        avatar: "https://ui.shadcn.com/avatars/02.png",
+      },
     },
     {
       id: "task-4",
@@ -45,6 +97,11 @@ const initialData: IKanbanData = {
       description: "Configure Jest and write initial tests",
       priority: "medium",
       status: "in-progress",
+      assignee: {
+        id: "user-4",
+        name: "Morgan Riley",
+        avatar: "https://ui.shadcn.com/avatars/04.png",
+      },
     },
     {
       id: "task-5",
@@ -59,6 +116,11 @@ const initialData: IKanbanData = {
       description: "Write user and developer documentation",
       priority: "low",
       status: "done",
+      assignee: {
+        id: "user-5",
+        name: "Jamie Quinn",
+        avatar: "https://ui.shadcn.com/avatars/05.png",
+      },
     },
     {
       id: "task-7",
@@ -72,12 +134,11 @@ const initialData: IKanbanData = {
 
 export function KanbanBoard() {
   const todoTasks = initialData.tasks.filter((task) => task.status === "todo");
-
   const inProgressTasks = initialData.tasks.filter(
     (task) => task.status === "in-progress"
   );
-
   const doneTasks = initialData.tasks.filter((task) => task.status === "done");
+  const allUsers = initialData.users;
 
   return (
     <div className="flex flex-col md:flex-row gap-4 h-full w-full">
@@ -89,6 +150,8 @@ export function KanbanBoard() {
             title={task.title}
             description={task.description}
             priority={task.priority}
+            assignee={task.assignee}
+            allUsers={allUsers}
           />
         ))}
       </Column>
@@ -105,6 +168,8 @@ export function KanbanBoard() {
             title={task.title}
             description={task.description}
             priority={task.priority}
+            assignee={task.assignee}
+            allUsers={allUsers}
           />
         ))}
       </Column>
@@ -117,6 +182,8 @@ export function KanbanBoard() {
             title={task.title}
             description={task.description}
             priority={task.priority}
+            assignee={task.assignee}
+            allUsers={allUsers}
           />
         ))}
       </Column>

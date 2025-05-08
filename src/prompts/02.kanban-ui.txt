@@ -1,5 +1,0 @@
-- Continue help me create kanban-style board layout using shadcnui and Tailwind.
-- I want three columns Todo, In progress, Done.
-- Each column should be able to display task cards.
-- Please keep the light/dark mode feature.
-- Bring the kanban UI into page and remove everything else in 'Page.tsx'. Just keep light/dark change theme.
