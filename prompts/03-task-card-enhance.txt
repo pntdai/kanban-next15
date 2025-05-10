@@ -1,0 +1,4 @@
+- Update <TaskCard /> component using shadcn/ui.
+- Each card will remain unchanged style and ui but add the assignee.
+- It should have an option to edit the assignee.
+- Make it look professional. Install missing components.

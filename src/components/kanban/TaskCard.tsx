@@ -18,8 +18,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Check, ChevronDown, User, UserPlus } from "lucide-react";
+import { Check, ChevronDown, Pencil, User } from "lucide-react";
 import { useState } from "react";
+import { TaskDialog } from "./TaskDialog";
 
 type TPriority = "low" | "medium" | "high";
 
@@ -29,6 +30,8 @@ type TUser = {
   avatar?: string;
 };
 
+type TTaskStatus = "todo" | "in-progress" | "done";
+
 type TTaskCard = {
   id: string;
   title: string;
@@ -37,6 +40,8 @@ type TTaskCard = {
   assignee?: TUser;
   allUsers: TUser[];
   className?: string;
+  onEdit?: (data: any) => void;
+  status: TTaskStatus;
 };
 
 const priorityColors: Record<TPriority, string> = {
@@ -54,6 +59,8 @@ export function TaskCard({
   assignee,
   allUsers,
   className,
+  onEdit,
+  status,
 }: TTaskCard) {
   const [open, setOpen] = useState(false);
 
@@ -66,11 +73,39 @@ export function TaskCard({
     setOpen(false);
   };
 
+  const task = {
+    id,
+    title,
+    description,
+    priority,
+    status,
+    assignee,
+  };
+
   return (
-    <Card className={cn("", className)}>
+    <Card className={cn("group", className)}>
       <CardContent className="p-3">
         <div className="space-y-2">
-          <div className="font-medium">{title}</div>
+          <div className="flex items-start justify-between">
+            <div className="font-medium">{title}</div>
+            {onEdit && (
+              <TaskDialog
+                task={task}
+                users={allUsers}
+                onSubmit={onEdit}
+                trigger={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Pencil className="h-3 w-3" />
+                    <span className="sr-only">Edit task</span>
+                  </Button>
+                }
+              />
+            )}
+          </div>
           {description && (
             <p className="text-sm text-muted-foreground">{description}</p>
           )}
@@ -135,9 +170,6 @@ export function TaskCard({
         </div>
       </CardContent>
       <CardFooter className="px-3 py-2 border-t flex justify-between">
-        <div className="text-xs text-muted-foreground">
-          #{id.substring(0, 6)}
-        </div>
         <Badge
           className={cn(
             "px-2 py-0.5 text-xs font-medium",

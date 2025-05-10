@@ -1,0 +1,3 @@
+- You did something really good. Now, Continue help me implement a task creation/editing dialog using shadcn Dialog and Form components.
+- Based on the UI that you provided before, We need fields for title, descrtipion, task priority and assignee. Include the client side validation using Zod and React Hooks Form.
+- Take a look at the @TaskCard.tsx component for how a task looks like.

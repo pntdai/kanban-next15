@@ -1,192 +1,143 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { Column } from "./Column";
-import { TaskCard } from "./TaskCard";
+import { TaskDialog } from "./TaskDialog";
+
+type TPriority = "low" | "medium" | "high";
+type TTaskStatus = "todo" | "in-progress" | "done";
+
+type TUser = {
+  id: string;
+  name: string;
+  avatar?: string;
+};
 
 type TTask = {
   id: string;
   title: string;
   description?: string;
-  priority: "low" | "medium" | "high";
-  status: "todo" | "in-progress" | "done";
-  assignee?: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
+  priority: TPriority;
+  status: TTaskStatus;
+  assignee?: TUser;
 };
 
-interface IKanbanData {
-  tasks: TTask[];
-  users: {
-    id: string;
-    name: string;
-    avatar?: string;
-  }[];
-}
+const sampleUsers: TUser[] = [
+  {
+    id: "1",
+    name: "John Doe",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+  },
+  {
+    id: "2",
+    name: "Jane Smith",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jane",
+  },
+  {
+    id: "3",
+    name: "Bob Johnson",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Bob",
+  },
+];
 
-// Sample data for demonstration
-const initialData: IKanbanData = {
-  users: [
-    {
-      id: "user-1",
-      name: "Alex Johnson",
-      avatar: "https://ui.shadcn.com/avatars/01.png",
-    },
-    {
-      id: "user-2",
-      name: "Taylor Smith",
-      avatar: "https://ui.shadcn.com/avatars/02.png",
-    },
-    {
-      id: "user-3",
-      name: "Jordan Casey",
-      avatar: "https://ui.shadcn.com/avatars/03.png",
-    },
-    {
-      id: "user-4",
-      name: "Morgan Riley",
-      avatar: "https://ui.shadcn.com/avatars/04.png",
-    },
-    {
-      id: "user-5",
-      name: "Jamie Quinn",
-      avatar: "https://ui.shadcn.com/avatars/05.png",
-    },
-  ],
-  tasks: [
-    {
-      id: "task-1",
-      title: "Implement authentication",
-      description: "Set up user login and registration",
-      priority: "high",
-      status: "todo",
-      assignee: {
-        id: "user-1",
-        name: "Alex Johnson",
-        avatar: "https://ui.shadcn.com/avatars/01.png",
-      },
-    },
-    {
-      id: "task-2",
-      title: "Design dashboard",
-      description: "Create wireframes for the main dashboard",
-      priority: "medium",
-      status: "todo",
-      assignee: {
-        id: "user-3",
-        name: "Jordan Casey",
-        avatar: "https://ui.shadcn.com/avatars/03.png",
-      },
-    },
-    {
-      id: "task-3",
-      title: "API integration",
-      description: "Connect to the backend API endpoints",
-      priority: "high",
-      status: "in-progress",
-      assignee: {
-        id: "user-2",
-        name: "Taylor Smith",
-        avatar: "https://ui.shadcn.com/avatars/02.png",
-      },
-    },
-    {
-      id: "task-4",
-      title: "Set up testing",
-      description: "Configure Jest and write initial tests",
-      priority: "medium",
-      status: "in-progress",
-      assignee: {
-        id: "user-4",
-        name: "Morgan Riley",
-        avatar: "https://ui.shadcn.com/avatars/04.png",
-      },
-    },
-    {
-      id: "task-5",
-      title: "Mobile responsiveness",
-      description: "Ensure the app works well on all devices",
-      priority: "low",
-      status: "in-progress",
-    },
-    {
-      id: "task-6",
-      title: "Documentation",
-      description: "Write user and developer documentation",
-      priority: "low",
-      status: "done",
-      assignee: {
-        id: "user-5",
-        name: "Jamie Quinn",
-        avatar: "https://ui.shadcn.com/avatars/05.png",
-      },
-    },
-    {
-      id: "task-7",
-      title: "Fix navigation bugs",
-      description: "Address issues with the navigation menu",
-      priority: "medium",
-      status: "done",
-    },
-  ],
-};
+const sampleTasks: TTask[] = [
+  {
+    id: "1",
+    title: "Implement user authentication",
+    description: "Add login and registration functionality",
+    priority: "high",
+    status: "todo",
+    assignee: sampleUsers[0],
+  },
+  {
+    id: "2",
+    title: "Design dashboard layout",
+    description: "Create responsive dashboard with charts",
+    priority: "medium",
+    status: "in-progress",
+    assignee: sampleUsers[1],
+  },
+  {
+    id: "3",
+    title: "Write API documentation",
+    description: "Document all API endpoints",
+    priority: "low",
+    status: "done",
+    assignee: sampleUsers[2],
+  },
+  {
+    id: "4",
+    title: "Fix navigation bugs",
+    description: "Resolve issues with mobile navigation",
+    priority: "high",
+    status: "todo",
+  },
+  {
+    id: "5",
+    title: "Optimize database queries",
+    description: "Improve query performance",
+    priority: "medium",
+    status: "in-progress",
+    assignee: sampleUsers[0],
+  },
+];
 
 export function KanbanBoard() {
-  const todoTasks = initialData.tasks.filter((task) => task.status === "todo");
-  const inProgressTasks = initialData.tasks.filter(
-    (task) => task.status === "in-progress"
-  );
-  const doneTasks = initialData.tasks.filter((task) => task.status === "done");
-  const allUsers = initialData.users;
+  const [tasks, setTasks] = useState<TTask[]>(sampleTasks);
+
+  const todoTasks = tasks.filter((task) => task.status === "todo");
+  const inProgressTasks = tasks.filter((task) => task.status === "in-progress");
+  const doneTasks = tasks.filter((task) => task.status === "done");
+
+  const handleCreateTask = (data: TTask) => {
+    const newTask: TTask = {
+      ...data,
+      id: uuidv4(),
+    };
+    console.log("newTask", newTask);
+    setTasks([...tasks, newTask]);
+  };
+
+  const handleEditTask = (data: TTask) => {
+    setTasks(
+      tasks.map((task) => (task.id === data.id ? { ...task, ...data } : task))
+    );
+  };
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 h-full w-full">
-      <Column title="Todo" count={todoTasks.length} className="bg-card/50">
-        {todoTasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            id={task.id}
-            title={task.title}
-            description={task.description}
-            priority={task.priority}
-            assignee={task.assignee}
-            allUsers={allUsers}
-          />
-        ))}
-      </Column>
-
+    <div className="flex gap-4 h-full p-4">
+      <Column
+        title="Todo"
+        tasks={todoTasks}
+        allUsers={sampleUsers}
+        onEdit={handleEditTask}
+      />
       <Column
         title="In Progress"
-        count={inProgressTasks.length}
-        className="bg-card/50"
-      >
-        {inProgressTasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            id={task.id}
-            title={task.title}
-            description={task.description}
-            priority={task.priority}
-            assignee={task.assignee}
-            allUsers={allUsers}
-          />
-        ))}
-      </Column>
+        tasks={inProgressTasks}
+        allUsers={sampleUsers}
+        onEdit={handleEditTask}
+      />
+      <Column
+        title="Done"
+        tasks={doneTasks}
+        allUsers={sampleUsers}
+        onEdit={handleEditTask}
+      />
 
-      <Column title="Done" count={doneTasks.length} className="bg-card/50">
-        {doneTasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            id={task.id}
-            title={task.title}
-            description={task.description}
-            priority={task.priority}
-            assignee={task.assignee}
-            allUsers={allUsers}
-          />
-        ))}
-      </Column>
+      <TaskDialog
+        users={sampleUsers}
+        onSubmit={handleCreateTask}
+        trigger={
+          <Button className="fixed bottom-4 right-4">
+            <Plus className="h-4 w-4 mr-2" />
+            New Task
+          </Button>
+        }
+      />
     </div>
   );
 }
