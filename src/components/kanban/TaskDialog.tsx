@@ -3,18 +3,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -29,11 +19,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -41,9 +26,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronDown, Pencil, Plus, User } from "lucide-react";
+import { User } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -65,13 +49,6 @@ type TTask = {
   status: TTaskStatus;
   assignee?: TUser;
 };
-
-interface ITaskDialogProps {
-  task?: TTask;
-  users: TUser[];
-  onSubmit: (data: any) => void;
-  trigger?: React.ReactNode;
-}
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -173,7 +150,7 @@ export function TaskDialog({
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger>
                         <SelectValue placeholder="Select priority" />
                       </SelectTrigger>
                     </FormControl>
@@ -193,14 +170,18 @@ export function TaskDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Assignee</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className="w-full justify-between"
-                        >
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setSelectedAssignee(
+                        users.find((user) => user.id === value)
+                      );
+                    }}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Unassigned">
                           {selectedAssignee ? (
                             <div className="flex items-center gap-2">
                               <Avatar className="h-6 w-6">
@@ -220,45 +201,25 @@ export function TaskDialog({
                               <span>Unassigned</span>
                             </div>
                           )}
-                          <ChevronDown className="h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0" align="start">
-                      <Command>
-                        <CommandInput placeholder="Search users..." />
-                        <CommandList>
-                          <CommandEmpty>No users found.</CommandEmpty>
-                          <CommandGroup>
-                            {users.map((user) => (
-                              <CommandItem
-                                key={user.id}
-                                onSelect={() => {
-                                  setSelectedAssignee(user);
-                                  field.onChange(user.id);
-                                }}
-                                className="flex items-center gap-2"
-                              >
-                                <Avatar className="h-6 w-6">
-                                  <AvatarImage
-                                    src={user.avatar}
-                                    alt={user.name}
-                                  />
-                                  <AvatarFallback>
-                                    {user.name.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span>{user.name}</span>
-                                {selectedAssignee?.id === user.id && (
-                                  <Check className="ml-auto h-4 w-4" />
-                                )}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                        </SelectValue>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {users.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={user.avatar} alt={user.name} />
+                              <AvatarFallback>
+                                {user.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{user.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

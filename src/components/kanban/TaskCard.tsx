@@ -5,20 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Check, ChevronDown, Pencil, User } from "lucide-react";
+import { Pencil, User } from "lucide-react";
 import { useState } from "react";
 import { TaskDialog } from "./TaskDialog";
 
@@ -62,15 +56,13 @@ export function TaskCard({
   onEdit,
   status,
 }: TTaskCard) {
-  const [open, setOpen] = useState(false);
-
   const [selectedAssignee, setSelectedAssignee] = useState<TUser | undefined>(
     assignee
   );
 
-  const handleSelect = (user: TUser) => {
+  const handleSelect = (userId: string) => {
+    const user = allUsers.find((u) => u.id === userId);
     setSelectedAssignee(user);
-    setOpen(false);
   };
 
   const task = {
@@ -111,13 +103,9 @@ export function TaskCard({
           )}
         </div>
         <div className="mt-3 pt-2 border-t">
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-between"
-              >
+          <Select value={selectedAssignee?.id} onValueChange={handleSelect}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Unassigned">
                 {selectedAssignee ? (
                   <div className="flex items-center gap-2">
                     <Avatar className="h-6 w-6">
@@ -137,36 +125,22 @@ export function TaskCard({
                     <span className="text-xs">Unassigned</span>
                   </div>
                 )}
-                <ChevronDown className="h-4 w-4 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="p-0" align="start" side="right">
-              <Command>
-                <CommandInput placeholder="Search users..." />
-                <CommandList>
-                  <CommandEmpty>No users found.</CommandEmpty>
-                  <CommandGroup>
-                    {allUsers.map((user) => (
-                      <CommandItem
-                        key={user.id}
-                        onSelect={() => handleSelect(user)}
-                        className="flex items-center gap-2"
-                      >
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src={user.avatar} alt={user.name} />
-                          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <span>{user.name}</span>
-                        {selectedAssignee?.id === user.id && (
-                          <Check className="ml-auto h-4 w-4" />
-                        )}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {allUsers.map((user) => (
+                <SelectItem key={user.id} value={user.id}>
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <span>{user.name}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </CardContent>
       <CardFooter className="px-3 py-2 border-t flex justify-between">

@@ -1,0 +1,1 @@
+- In @TaskCard.tsx  and @TaskDialog.tsx , i do not want to use <Popover /> to popup the list of assignee, I just  want to simple <Select /> component, and data will be remaining unchanged.
