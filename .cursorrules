@@ -1,4 +1,4 @@
-- This is the Next.js 15 project using React 19.
+- This is the Next.js 15 project using React 19 in client side and using postgresql as database.
 - The project is using Tailwind CSS for styling.
 - The project is using Shadcn UI for components.
 - Every single time we need to run a shadcn command, use `npx shadcn@latest`. Do everything using shadcn whenever possible.

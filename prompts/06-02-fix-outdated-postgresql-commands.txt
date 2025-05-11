@@ -1,0 +1,2 @@
+- When i run command 'npm run db:generate' it show the deprecated message: 'This command is deprecated, please use updated 'generate' command (see https://orm.drizzle.team/kit-docs/upgrade-21#how-to-migrate-to-0210)'.
+- Please check that and fix issues above.

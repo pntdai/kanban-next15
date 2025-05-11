@@ -1,0 +1,6 @@
+-You did really good in client side, now we will move on to setup to the server side.
+- We need to setup a database that will keep the data from this project. Let's store columns & tasks to match with UI that we finished before in the db.
+- Use Postgres for db & drizzle for the ORM.
+- For now, setup the docker compose file for Postgres, and drizzle connection setup etc (Note that I use Macbook M1).
+- You have to provide step by step instruction for me.
+- And finally, Don't touch the React components or pages yet.
