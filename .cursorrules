@@ -4,3 +4,10 @@
 - Every single time we need to run a shadcn command, use `npx shadcn@latest`. Do everything using shadcn whenever possible.
 - Every declare 'type' to the page, need to have prefix T and with interface we need to have prefix I.
 - Remove unsused import or interface and type.
+
+- It's Next.js so use Server Components when possible
+- Use server actions when possible
+- Use Next.js 15
+
+- If you generating validation schemas, forms, actions, working with db - THEN ALWAYS use the database schema from @/db/schema.ts as A SINGLE SOURCE OF TRUTH.
+- NEVER MODIFY OR REMOVE ANYTHING FROM THE DATABASE SCHEMA, UNLESS I EXPLICITLY TELL YOU TO DO SO.

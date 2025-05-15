@@ -1,6 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,77 +25,65 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { createTask } from "@/lib/queries";
+import { createTaskSchema, type TCreateTask } from "@/lib/schemas/task";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-type TPriority = "low" | "medium" | "high";
-type TTaskStatus = "todo" | "in-progress" | "done";
-
-type TUser = {
-  id: string;
-  name: string;
-  avatar?: string;
-};
+import { toast } from "sonner";
 
 type TTask = {
   id: string;
   title: string;
   description?: string;
-  priority: TPriority;
-  status: TTaskStatus;
-  assignee?: TUser;
+  priority: "low" | "medium" | "high";
+  status: "todo" | "in-progress" | "done";
 };
-
-const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  priority: z.enum(["low", "medium", "high"]),
-  assigneeId: z.string().optional(),
-});
 
 type TTaskDialogProps = {
   task?: TTask;
-  users: TUser[];
-  onSubmit: (data: any) => void;
+  onSubmit?: (data: any) => void;
   trigger?: React.ReactNode;
 };
 
-export function TaskDialog({
-  task,
-  users,
-  onSubmit,
-  trigger,
-}: TTaskDialogProps) {
+export function TaskDialog({ task, onSubmit, trigger }: TTaskDialogProps) {
   const [open, setOpen] = useState(false);
-  const [selectedAssignee, setSelectedAssignee] = useState<TUser | undefined>(
-    task?.assignee
-  );
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<TCreateTask>({
+    resolver: zodResolver(createTaskSchema),
     defaultValues: {
       title: task?.title || "",
       description: task?.description || "",
       priority: task?.priority || "medium",
-      assigneeId: task?.assignee?.id || "",
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    const data = {
-      ...values,
-      id: task?.id,
-      status: task?.status || "todo",
-      assignee: values.assigneeId
-        ? users.find((user) => user.id === values.assigneeId)
-        : undefined,
-    };
-    onSubmit(data);
-    setOpen(false);
-    form.reset();
+  const handleSubmit = async (values: TCreateTask) => {
+    try {
+      const { data, error } = await createTask(values);
+
+      if (error) {
+        toast.error("Error", {
+          description: error,
+        });
+        return;
+      }
+
+      toast.success("Success", {
+        description: "Task created successfully",
+      });
+
+      setOpen(false);
+      form.reset();
+
+      if (onSubmit) {
+        onSubmit(data);
+      }
+    } catch (error) {
+      toast.error("Error", {
+        description: "Failed to create task",
+      });
+    }
   };
 
   return (
@@ -158,66 +145,6 @@ export function TaskDialog({
                       <SelectItem value="low">Low</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="high">High</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="assigneeId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Assignee</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      setSelectedAssignee(
-                        users.find((user) => user.id === value)
-                      );
-                    }}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Unassigned">
-                          {selectedAssignee ? (
-                            <div className="flex items-center gap-2">
-                              <Avatar className="h-6 w-6">
-                                <AvatarImage
-                                  src={selectedAssignee.avatar}
-                                  alt={selectedAssignee.name}
-                                />
-                                <AvatarFallback>
-                                  {selectedAssignee.name.charAt(0)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <span>{selectedAssignee.name}</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <User className="h-4 w-4" />
-                              <span>Unassigned</span>
-                            </div>
-                          )}
-                        </SelectValue>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage src={user.avatar} alt={user.name} />
-                              <AvatarFallback>
-                                {user.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span>{user.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

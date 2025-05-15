@@ -1,0 +1,6 @@
+You did really good. Now we will continue in server side.
+- Based on the built of UI on @KanbanBoard.tsx and @TaskCard.tsx. Wee need to fetch columns and tasks.
+- This shhould achieved through:
+- It's Next.js so use Server Components when possible.
+- Use server actions when possible.
+- For now only handle the column & task fetching, storing/updating/deleting - this should ignored for now, and make sure not to use useEffect.

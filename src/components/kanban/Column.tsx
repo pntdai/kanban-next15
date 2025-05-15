@@ -1,65 +1,43 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import { TaskCard } from "./TaskCard";
 
 type TPriority = "low" | "medium" | "high";
 type TTaskStatus = "todo" | "in-progress" | "done";
 
-type TUser = {
-  id: string;
-  name: string;
-  avatar?: string;
-};
-
 type TTask = {
   id: string;
   title: string;
-  description?: string;
+  description: string | null;
   priority: TPriority;
   status: TTaskStatus;
-  assignee?: TUser;
+  columnId: string;
+  assigneeId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
-type TColumnProps = {
+interface IColumnProps {
   title: string;
   tasks: TTask[];
-  allUsers: TUser[];
-  onEdit?: (data: any) => void;
-  className?: string;
-};
+}
 
-export function Column({
-  title,
-  tasks,
-  allUsers,
-  onEdit,
-  className,
-}: TColumnProps) {
+export function Column({ title, tasks }: IColumnProps) {
   return (
-    <Card className={cn("flex-1 min-w-[300px]", className)}>
-      <CardHeader className="p-3">
-        <CardTitle className="text-sm font-medium flex items-center justify-between">
-          <span>{title}</span>
-          <span className="text-muted-foreground">{tasks.length}</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-2 space-y-2">
+    <div className="flex-1 min-w-[300px] bg-muted/50 rounded-lg p-4">
+      <h2 className="font-semibold mb-4">{title}</h2>
+      <div className="space-y-4">
         {tasks.map((task) => (
           <TaskCard
             key={task.id}
             id={task.id}
             title={task.title}
-            description={task.description}
+            description={task.description ?? undefined}
             priority={task.priority}
-            assignee={task.assignee}
-            allUsers={allUsers}
             status={task.status}
-            onEdit={onEdit}
           />
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

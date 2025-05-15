@@ -1,0 +1,2 @@
+- When I run code show alway call POST. It leads to some errors on browser as: "installHook.js:1 Cannot update a component (`Router`) while rendering a different component (`KanbanBoard`). To locate the bad setState() call inside `KanbanBoard`, follow the stack trace as described in https://react.dev/link/setstate-in-render"
+- Another error in terminal line 19-31 I have pasted in your "chat"

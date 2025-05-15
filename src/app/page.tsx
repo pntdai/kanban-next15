@@ -1,4 +1,4 @@
-import { KanbanBoard } from "@/components/kanban/KanbanBoard";
+import { KanbanBoardWrapper } from "@/components/kanban/KanbanBoardWrapper";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1 p-4 md:p-6 overflow-auto">
-        <KanbanBoard />
+        <KanbanBoardWrapper />
       </main>
 
       <footer className="border-t px-4 py-3 text-center text-sm text-muted-foreground">
