@@ -25,10 +25,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { createTask } from "@/lib/queries";
-import { createTaskSchema, type TCreateTask } from "@/lib/schemas/task";
+import { createTask, updateTask } from "@/lib/queries";
+import {
+  createTaskSchema,
+  updateTaskSchema,
+  type TCreateTask,
+  type TUpdateTask,
+} from "@/lib/schemas/task";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -49,18 +54,40 @@ type TTaskDialogProps = {
 export function TaskDialog({ task, onSubmit, trigger }: TTaskDialogProps) {
   const [open, setOpen] = useState(false);
 
-  const form = useForm<TCreateTask>({
-    resolver: zodResolver(createTaskSchema),
+  const form = useForm<TCreateTask | TUpdateTask>({
+    resolver: zodResolver(task ? updateTaskSchema : createTaskSchema),
     defaultValues: {
-      title: task?.title || "",
-      description: task?.description || "",
-      priority: task?.priority || "medium",
+      title: "",
+      description: "",
+      priority: "medium",
+      status: "todo",
     },
   });
 
-  const handleSubmit = async (values: TCreateTask) => {
+  useEffect(() => {
+    if (task && open) {
+      form.reset({
+        title: task.title,
+        description: task.description || "",
+        priority: task.priority,
+        status: task.status,
+        id: task.id,
+      });
+    } else if (!task && open) {
+      form.reset({
+        title: "",
+        description: "",
+        priority: "medium",
+        status: "todo",
+      });
+    }
+  }, [task, open, form]);
+
+  const handleSubmit = async (values: TCreateTask | TUpdateTask) => {
     try {
-      const { data, error } = await createTask(values);
+      const { data, error } = task
+        ? await updateTask(values as TUpdateTask)
+        : await createTask(values as TCreateTask);
 
       if (error) {
         toast.error("Error", {
@@ -70,7 +97,9 @@ export function TaskDialog({ task, onSubmit, trigger }: TTaskDialogProps) {
       }
 
       toast.success("Success", {
-        description: "Task created successfully",
+        description: task
+          ? "Task updated successfully"
+          : "Task created successfully",
       });
 
       setOpen(false);
@@ -81,7 +110,7 @@ export function TaskDialog({ task, onSubmit, trigger }: TTaskDialogProps) {
       }
     } catch (error) {
       toast.error("Error", {
-        description: "Failed to create task",
+        description: task ? "Failed to update task" : "Failed to create task",
       });
     }
   };
@@ -151,6 +180,33 @@ export function TaskDialog({ task, onSubmit, trigger }: TTaskDialogProps) {
                 </FormItem>
               )}
             />
+            {task && (
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="todo">Todo</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <div className="flex justify-end gap-2">
               <Button
                 type="button"

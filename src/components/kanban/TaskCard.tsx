@@ -17,6 +17,7 @@ interface ITaskCard {
   priority: TPriority;
   className?: string;
   status: TTaskStatus;
+  onTaskUpdate?: () => void;
 }
 
 const priorityColors: Record<TPriority, string> = {
@@ -33,6 +34,7 @@ export function TaskCard({
   priority,
   className,
   status,
+  onTaskUpdate,
 }: ITaskCard) {
   return (
     <Card className={cn("group", className)}>
@@ -42,7 +44,7 @@ export function TaskCard({
             <div className="font-medium">{title}</div>
             <TaskDialog
               task={{ id, title, description, priority, status }}
-              onSubmit={async () => {}}
+              onSubmit={onTaskUpdate}
               trigger={
                 <Button
                   variant="ghost"

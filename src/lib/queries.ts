@@ -5,7 +5,12 @@ import { columns, tasks } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { v4 as uuidv4 } from "uuid";
-import { createTaskSchema, type TCreateTask } from "./schemas/task";
+import {
+  createTaskSchema,
+  updateTaskSchema,
+  type TCreateTask,
+  type TUpdateTask,
+} from "./schemas/task";
 
 const DEFAULT_COLUMNS = ["Todo", "In Progress", "Done"] as const;
 
@@ -82,7 +87,6 @@ export async function createTask(data: TCreateTask) {
         description: validatedData.description || null,
         priority: validatedData.priority,
         status: "todo", // Default status for new tasks
-        assigneeId: validatedData.assigneeId || null,
         columnId: todoColumn.id,
       })
       .returning();
@@ -96,5 +100,35 @@ export async function createTask(data: TCreateTask) {
       return { data: null, error: error.message };
     }
     return { data: null, error: "Failed to create task" };
+  }
+}
+
+export async function updateTask(data: TUpdateTask) {
+  try {
+    // Validate data
+    const validatedData = updateTaskSchema.parse(data);
+
+    // Update task
+    const [task] = await db
+      .update(tasks)
+      .set({
+        title: validatedData.title,
+        description: validatedData.description || null,
+        priority: validatedData.priority,
+        status: validatedData.status,
+        updatedAt: new Date(),
+      })
+      .where(eq(tasks.id, validatedData.id))
+      .returning();
+
+    // Revalidate the kanban page
+    revalidatePath("/kanban");
+
+    return { data: task, error: null };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { data: null, error: error.message };
+    }
+    return { data: null, error: "Failed to update task" };
   }
 }

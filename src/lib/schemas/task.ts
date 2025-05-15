@@ -10,7 +10,6 @@ export const taskSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   priority: taskPriorityEnum,
-  assigneeId: z.string().uuid().optional(),
   status: taskStatusEnum,
 });
 
